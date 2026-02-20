@@ -1,0 +1,182 @@
+:root {
+    --bg-color: #f0f2f5;
+    --canvas-bg: #ffffff;
+    --primary-color: #333333;
+    --accent-color: #6366f1; /* Indigo-500 */
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --tool-active-bg: rgba(99, 102, 241, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(34, 211, 238, 0.15) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(244, 63, 94, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+    height: 100vh;
+    overflow: hidden;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Canvas Styling */
+#canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: transparent; /* Let body gradient show through slightly or user preference */
+    background-color: var(--canvas-bg); /* Clean white canvas */
+    cursor: crosshair;
+    box-shadow: var(--shadow-sm);
+    /* Make canvas feel like a sheet of paper */
+    margin: 20px;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    border-radius: 12px;
+    touch-action: none;
+}
+
+/* Toolbar Styling */
+.toolbar-container {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s ease;
+}
+
+.toolbar:hover {
+    transform: translateY(-2px);
+}
+
+.tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 12px;
+    color: #64748b;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-btn i {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.tool-label {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Hover & Active States */
+.tool-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+}
+
+.tool-btn.active {
+    background-color: var(--tool-active-bg);
+    color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.tool-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 20%;
+    height: 4px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Specific Action Button (Clear) */
+.action-btn {
+    color: #ef4444; /* Red for destructive actions */
+}
+
+.action-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.separator {
+    width: 1px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    #canvas {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+    
+    .toolbar-container {
+        bottom: 20px;
+        width: 90%;
+    }
+    
+    .toolbar {
+        width: 100%;
+        justify-content: space-around;
+        padding: 10px;
+    }
+    
+    .tool-label {
+        display: none; /* Hide text on small screens */
+    }
+    
+    .tool-btn i {
+        font-size: 28px;
+        margin-bottom: 0;
+    }
+}

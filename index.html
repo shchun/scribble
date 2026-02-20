@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scribble - Premium Sketchbook</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for modern, clean icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Floating Toolbar with Glassmorphism -->
+        <div class="toolbar-container">
+            <div class="toolbar">
+                <button class="tool-btn active" id="pen-tool" title="Pen">
+                    <i class="ph ph-pen-nib"></i>
+                    <span class="tool-label">Pen</span>
+                </button>
+                <button class="tool-btn" id="highlighter-tool" title="Highlighter">
+                    <i class="ph ph-marker-circle"></i>
+                    <span class="tool-label">Highlight</span>
+                </button>
+                <button class="tool-btn" id="eraser-tool" title="Eraser">
+                    <i class="ph ph-eraser"></i>
+                    <span class="tool-label">Eraser</span>
+                </button>
+                <button class="tool-btn" id="save-tool" title="Save Image">
+                    <i class="ph ph-download-simple"></i>
+                    <span class="tool-label">Save</span>
+                </button>
+                <div class="separator"></div>
+                <button class="tool-btn action-btn" id="clear-tool" title="Clear Canvas">
+                    <i class="ph ph-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Drawing Canvas -->
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
