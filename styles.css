@@ -144,6 +144,28 @@ body {
     color: #dc2626;
 }
 
+/* Undo/Redo are neutral (non-destructive) actions */
+#undo-tool,
+#redo-tool {
+    color: #475569; /* Slate-600 */
+}
+
+#undo-tool:hover,
+#redo-tool:hover {
+    background-color: rgba(71, 85, 105, 0.1);
+    color: #1e293b;
+}
+
+.tool-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.tool-btn:disabled:hover {
+    background-color: transparent;
+    color: inherit;
+}
+
 .separator {
     width: 1px;
     height: 32px;

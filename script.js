@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const highlighterBtn = document.getElementById('highlighter-tool');
     const eraserBtn = document.getElementById('eraser-tool');
     const clearBtn = document.getElementById('clear-tool');
+    const undoBtn = document.getElementById('undo-tool');
+    const redoBtn = document.getElementById('redo-tool');
 
     const tools = {
         PEN: 'pen',
@@ -110,6 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeCanvas();
         ctx.drawImage(tempCanvas, 0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
         updateContext();
+
+        // Snapshots are sized to the old buffer; re-baseline history at the new size.
+        if (typeof pushHistory === 'function') {
+            history = [];
+            historyStep = -1;
+            pushHistory();
+        }
     });
 
     function updateContext() {
@@ -133,6 +142,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateContext();
     }
+
+    // Undo / Redo History
+    // Snapshots are stored as ImageData (device pixels) so restore is synchronous.
+    const MAX_HISTORY = 40;
+    let history = [];
+    let historyStep = -1;
+
+    function snapshot() {
+        return ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    function pushHistory() {
+        // Drop any redo states that are no longer reachable.
+        if (historyStep < history.length - 1) {
+            history = history.slice(0, historyStep + 1);
+        }
+        history.push(snapshot());
+
+        // Cap memory usage by dropping the oldest snapshot.
+        if (history.length > MAX_HISTORY) {
+            history.shift();
+        }
+        historyStep = history.length - 1;
+        updateUndoRedoButtons();
+    }
+
+    function restoreHistory() {
+        const image = history[historyStep];
+        if (!image) return;
+
+        // putImageData ignores the current transform/composite, so this is safe
+        // regardless of the active tool.
+        ctx.putImageData(image, 0, 0);
+    }
+
+    function undo() {
+        if (historyStep <= 0) return;
+        historyStep--;
+        restoreHistory();
+        updateUndoRedoButtons();
+    }
+
+    function redo() {
+        if (historyStep >= history.length - 1) return;
+        historyStep++;
+        restoreHistory();
+        updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+        undoBtn.disabled = historyStep <= 0;
+        redoBtn.disabled = historyStep >= history.length - 1;
+    }
+
+    // Capture the initial (blank) canvas as the first history entry.
+    pushHistory();
 
     // Drawing Logic
     function startDrawing(e) {
@@ -165,8 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stopDrawing() {
+        if (!isDrawing) return;
         isDrawing = false;
         ctx.beginPath(); // Reset path to prevent connecting new lines to old ones
+        pushHistory();   // Record this completed stroke for undo/redo
     }
 
     function getCoordinates(e) {
@@ -207,6 +274,25 @@ document.addEventListener('DOMContentLoaded', () => {
     highlighterBtn.addEventListener('click', () => setActiveTool(tools.HIGHLIGHTER));
     eraserBtn.addEventListener('click', () => setActiveTool(tools.ERASER));
 
+    // Undo / Redo
+    undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);
+
+    document.addEventListener('keydown', (e) => {
+        const ctrl = e.ctrlKey || e.metaKey;
+        if (!ctrl) return;
+
+        const key = e.key.toLowerCase();
+        if (key === 'z' && !e.shiftKey) {
+            e.preventDefault();
+            undo();
+        } else if ((key === 'z' && e.shiftKey) || key === 'y') {
+            // Ctrl+Shift+Z or Ctrl+Y for redo
+            e.preventDefault();
+            redo();
+        }
+    });
+
     // Save Image
     const saveBtn = document.getElementById('save-tool');
     saveBtn.addEventListener('click', () => {
@@ -241,5 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Restore
         ctx.globalCompositeOperation = currentComposite;
+
+        pushHistory(); // Make the clear undoable
     });
 });
